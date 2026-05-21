@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+#     (via .yaml file.)
+#     file: db/changelog/changeset/001-init-database.yaml
+
+#     (via .sql file)
+      file: db/changelog/changeset/001-init-database.sql

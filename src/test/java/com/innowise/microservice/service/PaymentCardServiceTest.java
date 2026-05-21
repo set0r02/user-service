@@ -1,0 +1,247 @@
+package com.innowise.microservice.service;
+
+
+import com.innowise.microservice.dto.PaymentCardInputDto;
+import com.innowise.microservice.dto.PaymentCardOutputDto;
+import com.innowise.microservice.mapper.PaymentCardMapper;
+import com.innowise.microservice.model.PaymentCard;
+import com.innowise.microservice.model.User;
+import com.innowise.microservice.repository.PaymentCardRepository;
+import com.innowise.microservice.repository.UserRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class PaymentCardServiceTest {
+
+    @Mock
+    private PaymentCardRepository paymentCardRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private PaymentCardMapper paymentCardMapper;
+
+    @InjectMocks
+    private PaymentCardService paymentCardService;
+
+    @Test
+    void createPaymentCardTest(){
+        User user = new User();
+        user.setId(2L);
+        PaymentCard paymentCard = new PaymentCard();
+
+        PaymentCardInputDto paymentCardInputDto = new PaymentCardInputDto(
+                "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L
+        );
+        PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
+                3L, "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L,
+                null,
+                null
+        );
+
+        when(userRepository.findById(2L))
+                .thenReturn(Optional.of(user));
+        when(paymentCardMapper.toEntity(paymentCardInputDto))
+                .thenReturn(paymentCard);
+        when(paymentCardRepository.save(paymentCard))
+                .thenReturn(paymentCard);
+        when(paymentCardMapper.toDto(paymentCard))
+                .thenReturn(paymentCardOutputDto);
+
+        PaymentCardOutputDto resultOutputDto = paymentCardService.createPaymentCard(paymentCardInputDto);
+
+        assertNotNull(resultOutputDto);
+        assertEquals(2L,resultOutputDto.userId());
+        assertEquals(3L,resultOutputDto.id());
+
+        verify(userRepository).findById(2L);
+        verify(paymentCardRepository).countByUserId(2L);
+        verify(paymentCardRepository).save(paymentCard);
+
+
+    }
+
+
+    @Test
+    void ThrowExceptionWhenCardLimitMoreThanFiveReachedTest(){
+
+        Long userId = 1L;
+        PaymentCardInputDto paymentCardInputDto = new PaymentCardInputDto(
+                "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L
+        );
+
+        User user = new User();
+        user.setId(userId);
+
+        List<PaymentCard> paymentCards = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            paymentCards.add(new PaymentCard());
+        }
+        user.setPaymentCards(paymentCards);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> paymentCardService.createPaymentCard(paymentCardInputDto)
+        );
+
+        verify(paymentCardRepository, never()).save(any());
+    }
+
+
+    @Test
+    void findPaymentCardByIdTest() {
+        PaymentCard paymentCard = new PaymentCard();
+        paymentCard.setId(3L);
+
+        PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
+                3L, "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L,
+                null,
+                null
+        );
+
+        PaymentCardOutputDto resultDto =
+                paymentCardService.findPaymentCardById(2L);
+
+        when(paymentCardMapper.toDto(paymentCard))
+                .thenReturn(paymentCardOutputDto);
+
+        when(paymentCardRepository.findById(3L))
+                .thenReturn(Optional.of(paymentCard));
+
+        assertNotNull(resultDto);
+        assertEquals(2L, resultDto.id());
+    }
+
+    @Test
+    void getAllPaymentCardsTest() {
+        String name = "Petr";
+        String surname = "Petrov";
+        Pageable pageable = PageRequest.of(0, 10);
+
+        PaymentCard card = new PaymentCard();
+        Page<PaymentCard> cardPage = new PageImpl<>(List.of(card));
+        PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
+                3L, "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L,
+                null,
+                null
+        );
+
+        when(paymentCardRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(cardPage);
+        when(paymentCardMapper.toDto(card))
+                .thenReturn(paymentCardOutputDto);
+
+        Page<PaymentCardOutputDto> resultDto = paymentCardService.getAllPaymentCards(name, surname, pageable);
+
+        assertNotNull(resultDto);
+        assertThat(resultDto.getContent()).hasSize(1);
+        verify(paymentCardRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+    }
+
+    @Test
+    void findAllPaymentCardsByUserIdTest() {
+        Long userId = 2L;
+        PaymentCard card = new PaymentCard();
+        PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
+                3L, "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L,
+                null,
+                null
+        );
+
+        when(paymentCardRepository.findAllByUserId(userId)).thenReturn(List.of(card));
+        when(paymentCardMapper.toDto(card)).thenReturn(paymentCardOutputDto);
+
+        List<PaymentCardOutputDto> result = paymentCardService.findAllPaymentCardsByUserId(userId);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).userId()).isEqualTo(userId);
+        verify(paymentCardRepository, times(1)).findAllByUserId(userId);
+    }
+
+    @Test
+    void updatePaymentCardByIdTest() {
+        Long cardId = 10L;
+        PaymentCard card = new PaymentCard();
+        card.setId(cardId);
+        card.setActive(true);
+
+        PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
+                3L, "7845127458961247",
+                "Petr Petrov",
+                LocalDate.of(2027, 10, 5),
+                true,
+                2L,
+                null,
+                null
+        );
+
+        when(paymentCardRepository.findById(cardId)).thenReturn(Optional.of(card));
+        when(paymentCardMapper.toDto(card)).thenReturn(paymentCardOutputDto);
+
+        PaymentCardOutputDto result = paymentCardService.updateCardPaymentStatus(cardId, false);
+
+        assertNotNull(result);
+        assertFalse(card.getActive());
+    }
+
+    @Test
+    void deletePaymentCardTest(){
+
+        Long paymentCardId = 1L;
+
+        PaymentCard paymentCard = new PaymentCard();
+        paymentCard.setId(paymentCardId);
+        paymentCardService.deletePaymentCard(paymentCardId);
+
+        when(paymentCardRepository.findById(paymentCardId))
+                .thenReturn(Optional.of(paymentCard));
+
+        verify(paymentCardRepository).deleteById(paymentCardId);
+    }
+}

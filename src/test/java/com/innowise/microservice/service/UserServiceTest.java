@@ -14,8 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -34,7 +37,7 @@ public class UserServiceTest {
 
     @Test
     void createUserTest(){
-        UserInputDto UserInputDto = new UserInputDto(
+        UserInputDto userInputDto = new UserInputDto(
                 "Petr",
                 "Petrov",
                 LocalDate.of(2004, 5, 7),
@@ -54,14 +57,22 @@ public class UserServiceTest {
 
         User user = new User();
 
-        when(userRepository.findByEmail(UserInputDto.email()))
+        when(userRepository.findByEmail(userInputDto.email()))
                 .thenReturn(Optional.empty());
-        when(userMapper.toEntity(UserInputDto))
+        when(userMapper.toEntity(userInputDto))
                 .thenReturn(user);
         when(userRepository.save(user))
                 .thenReturn(user);
         when(userMapper.toDto(user))
                 .thenReturn(userOutputDto);
+        UserOutputDto actualResponse = userService.createUser(userInputDto);
+
+        assertNotNull(actualResponse);
+        assertEquals(actualResponse.id(),1L);
+        assertEquals(actualResponse.email(),"petrov@mail.com");
+
+        verify(userRepository, times(1)).findByEmail(userInputDto.email());
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test

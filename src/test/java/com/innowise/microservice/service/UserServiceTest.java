@@ -1,5 +1,7 @@
 package com.innowise.microservice.service;
 
+import com.innowise.microservice.dto.UserInputDto;
+import com.innowise.microservice.dto.UserOutputDto;
 import com.innowise.microservice.mapper.UserMapper;
 import com.innowise.microservice.model.User;
 import com.innowise.microservice.repository.UserRepository;
@@ -9,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
@@ -31,7 +34,34 @@ public class UserServiceTest {
 
     @Test
     void createUserTest(){
+        UserInputDto UserInputDto = new UserInputDto(
+                "Petr",
+                "Petrov",
+                LocalDate.of(2004, 5, 7),
+                "petrov@gmail.com",
+                true);
 
+        UserOutputDto userOutputDto = new UserOutputDto(
+                1L,
+                "Petr",
+                "Petrov",
+                LocalDate.of(2004, 5, 7),
+                "petrov@mail.com",
+                true,
+                null,
+                null,
+                null);
+
+        User user = new User();
+
+        when(userRepository.findByEmail(UserInputDto.email()))
+                .thenReturn(Optional.empty());
+        when(userMapper.toEntity(UserInputDto))
+                .thenReturn(user);
+        when(userRepository.save(user))
+                .thenReturn(user);
+        when(userMapper.toDto(user))
+                .thenReturn(userOutputDto);
     }
 
     @Test

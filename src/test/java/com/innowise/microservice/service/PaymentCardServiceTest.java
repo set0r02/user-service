@@ -46,9 +46,11 @@ public class PaymentCardServiceTest {
 
     @Test
     void createPaymentCardTest(){
+
         User user = new User();
-        user.setId(2L);
         PaymentCard paymentCard = new PaymentCard();
+
+        user.setId(2L);
 
         PaymentCardInputDto paymentCardInputDto = new PaymentCardInputDto(
                 "7845127458961247",
@@ -57,6 +59,7 @@ public class PaymentCardServiceTest {
                 true,
                 2L
         );
+
         PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
                 3L, "7845127458961247",
                 "Petr Petrov",
@@ -86,14 +89,10 @@ public class PaymentCardServiceTest {
         verify(paymentCardRepository).countByUserId(2L);
         verify(paymentCardRepository).save(paymentCard);
 
-
     }
-
 
     @Test
     void ThrowExceptionWhenCardLimitMoreThanFiveReachedTest(){
-
-        Long userId = 1L;
         PaymentCardInputDto paymentCardInputDto = new PaymentCardInputDto(
                 "7845127458961247",
                 "Petr Petrov",
@@ -103,7 +102,7 @@ public class PaymentCardServiceTest {
         );
 
         User user = new User();
-        user.setId(userId);
+        user.setId(1L);
 
         List<PaymentCard> paymentCards = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -111,7 +110,7 @@ public class PaymentCardServiceTest {
         }
         user.setPaymentCards(paymentCards);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         RuntimeException exception = assertThrows(
                 RuntimeException.class,
@@ -119,6 +118,7 @@ public class PaymentCardServiceTest {
         );
 
         verify(paymentCardRepository, never()).save(any());
+
     }
 
 
@@ -148,6 +148,7 @@ public class PaymentCardServiceTest {
 
         assertNotNull(resultDto);
         assertEquals(2L, resultDto.id());
+
     }
 
     @Test

@@ -21,5 +21,6 @@ public record UserInputDto(
         String email,
 
         @NotNull(message = "Active is required")
-        Boolean active) {
+        Boolean active
+) {
 }

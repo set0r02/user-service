@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface PaymentCardMapper {
+
     PaymentCard toEntity(PaymentCardInputDto dto);
     PaymentCardOutputDto toDto(PaymentCard entity);
+
 }

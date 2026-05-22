@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Table(name = "payment_cards")
-public class PaymentCard extends AuditableEntity implements BaseEntity<Long>{
+public class PaymentCard extends AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,4 +25,6 @@ public record PaymentCardInputDto(
 
         @NotNull(message = "User ID is required")
         Long userId
-) {}
+) {
+
+}

@@ -26,6 +26,4 @@ public interface PaymentCardRepository extends JpaRepository<PaymentCard,Long>, 
 
     int countByUserId(Long userId);
 
-
-
 }

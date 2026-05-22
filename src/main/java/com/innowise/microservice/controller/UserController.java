@@ -2,7 +2,7 @@ package com.innowise.microservice.controller;
 
 import com.innowise.microservice.dto.UserInputDto;
 import com.innowise.microservice.dto.UserOutputDto;
-import com.innowise.microservice.service.UserService;
+import com.innowise.microservice.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping
     public ResponseEntity<UserOutputDto> createUser(@RequestBody @Valid UserInputDto userInputDto){

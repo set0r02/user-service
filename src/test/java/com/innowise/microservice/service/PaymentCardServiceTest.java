@@ -7,6 +7,7 @@ import com.innowise.microservice.model.PaymentCard;
 import com.innowise.microservice.model.User;
 import com.innowise.microservice.repository.PaymentCardRepository;
 import com.innowise.microservice.repository.UserRepository;
+import com.innowise.microservice.service.impl.PaymentCardServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,7 +41,7 @@ public class PaymentCardServiceTest {
     private PaymentCardMapper paymentCardMapper;
 
     @InjectMocks
-    private PaymentCardService paymentCardService;
+    private PaymentCardServiceImpl paymentCardService;
 
     @Test
     void createPaymentCardTest(){

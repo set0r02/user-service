@@ -5,6 +5,7 @@ import com.innowise.microservice.dto.UserOutputDto;
 import com.innowise.microservice.mapper.UserMapper;
 import com.innowise.microservice.model.User;
 import com.innowise.microservice.repository.UserRepository;
+import com.innowise.microservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,7 +39,7 @@ public class UserServiceTest {
     private UserMapper userMapper;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Test
     void createUserTest(){

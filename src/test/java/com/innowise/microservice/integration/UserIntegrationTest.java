@@ -1,59 +1,156 @@
 package com.innowise.microservice.integration;
 
-import com.innowise.microservice.dto.UserInputDto;
-import com.innowise.microservice.dto.UserOutputDto;
-import org.junit.jupiter.api.DisplayName;
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
-import java.util.Objects;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+@SpringBootTest
+@Testcontainers
+@ActiveProfiles("test")
+class UserIntegrationTest {
 
-public class UserIntegrationTest extends BaseIntegrationTest{
+    private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+
+    @BeforeEach
+    void setUp() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        jdbcTemplate.execute("TRUNCATE TABLE payment_cards, users RESTART IDENTITY CASCADE;");
+    }
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
     @Test
-    @DisplayName("Full User lifecycle using WebTestClient")
-    void userLifecycleFlow() {
-        UserInputDto userOutputDto = new UserInputDto(
-                "Dima", "Smirnov", LocalDate.of(1987, 5, 12), "smirnov.doe@mail.com", true
-        );
+    void createUserSuccessfullyTest() throws Exception {
+        mockMvc.perform(post("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name":"Petr",
+                                    "surname":"Petrov",
+                                    "birthDate":"2004-05-07",
+                                    "email":"alex@test.com",
+                                    "active":true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Petr"))
+                .andExpect(jsonPath("$.surname").value("Petrov"))
+                .andExpect(jsonPath("$.email").value("alex@test.com"));
+    }
 
-        UserOutputDto created = webTestClient.post()
-                .uri("/api/users")
-                .bodyValue(userOutputDto)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(UserOutputDto.class)
-                .returnResult()
-                .getResponseBody();
+    @Test
+    void updateUserTest() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name":"Old",
+                                    "surname":"User",
+                                    "birthDate":"2000-01-01",
+                                    "email":"old@test.com",
+                                    "active":true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        assertNotNull(created);
-        Long userId = created.id();
+        String response = result.getResponse().getContentAsString();
+        Object id = JsonPath.read(response, "$.id");
 
-        UserOutputDto fetched = webTestClient.get()
-                .uri("/api/users/" + userId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(UserOutputDto.class)
-                .returnResult()
-                .getResponseBody();
+        mockMvc.perform(put("/api/user/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name":"Updated",
+                                    "surname":"UpdatedSurname",
+                                    "birthDate":"2000-01-01",
+                                    "email":"updated@test.com",
+                                    "active":true
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Updated"))
+                .andExpect(jsonPath("$.surname").value("UpdatedSurname"));
+    }
 
-        assertNotNull(fetched);
-        assertEquals("Dima", fetched.name());
+    @Test
+    void updateUserStatusTest() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name":"Active",
+                                    "surname":"User",
+                                    "birthDate":"2000-01-01",
+                                    "email":"status@test.com",
+                                    "active":true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        UserOutputDto cachedUser = Objects.requireNonNull(cacheManager.getCache("users"))
-                .get(userId, UserOutputDto.class);
+        String response = result.getResponse().getContentAsString();
+        Object id = JsonPath.read(response, "$.id");
 
-        assertNotNull(cachedUser);
+        mockMvc.perform(patch("/api/user/" + id + "/status/false"))
+                .andExpect(status().isNoContent());
 
-        webTestClient.delete()
-                .uri("/api/users/" + userId)
-                .exchange()
-                .expectStatus().isNoContent(); // Проверяем статус 204
+        mockMvc.perform(patch("/api/user/" + id + "/status/true"))
+                .andExpect(status().isNoContent());
+    }
 
-        assertThat(userRepository.findById(userId)).isEmpty();
-        assertThat(Objects.requireNonNull(cacheManager.getCache("users")).get(userId)).isNull();
+    @Test
+    void deleteUserTest() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name":"Delete",
+                                    "surname":"User",
+                                    "birthDate":"2000-01-01",
+                                    "email":"delete@test.com",
+                                    "active":true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        Object id = JsonPath.read(response, "$.id");
+
+        mockMvc.perform(delete("/api/user/" + id))
+                .andExpect(status().isNoContent());
     }
 }

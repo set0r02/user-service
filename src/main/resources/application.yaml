@@ -10,6 +10,7 @@ spring:
 
   liquibase:
     change-log-path: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
 
   jpa:
     hibernate:

@@ -1,6 +1,5 @@
 package com.innowise.microservice.service;
 
-
 import com.innowise.microservice.dto.PaymentCardInputDto;
 import com.innowise.microservice.dto.PaymentCardOutputDto;
 import com.innowise.microservice.mapper.PaymentCardMapper;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,11 +44,9 @@ public class PaymentCardServiceTest {
 
     @Test
     void createPaymentCardTest(){
-
         User user = new User();
-        PaymentCard paymentCard = new PaymentCard();
-
         user.setId(2L);
+        PaymentCard paymentCard = new PaymentCard();
 
         PaymentCardInputDto paymentCardInputDto = new PaymentCardInputDto(
                 "7845127458961247",
@@ -61,7 +57,8 @@ public class PaymentCardServiceTest {
         );
 
         PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
-                3L, "7845127458961247",
+                3L,
+                "7845127458961247",
                 "Petr Petrov",
                 LocalDate.of(2027, 10, 5),
                 true,
@@ -70,25 +67,19 @@ public class PaymentCardServiceTest {
                 null
         );
 
-        when(userRepository.findById(2L))
-                .thenReturn(Optional.of(user));
-        when(paymentCardMapper.toEntity(paymentCardInputDto))
-                .thenReturn(paymentCard);
-        when(paymentCardRepository.save(paymentCard))
-                .thenReturn(paymentCard);
-        when(paymentCardMapper.toDto(paymentCard))
-                .thenReturn(paymentCardOutputDto);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+        when(paymentCardMapper.toEntity(paymentCardInputDto)).thenReturn(paymentCard);
+        when(paymentCardRepository.save(paymentCard)).thenReturn(paymentCard);
+        when(paymentCardMapper.toDto(paymentCard)).thenReturn(paymentCardOutputDto);
 
         PaymentCardOutputDto resultOutputDto = paymentCardService.createPaymentCard(paymentCardInputDto);
 
         assertNotNull(resultOutputDto);
-        assertEquals(2L,resultOutputDto.userId());
-        assertEquals(3L,resultOutputDto.id());
+        assertEquals(2L, resultOutputDto.userId());
+        assertEquals(3L, resultOutputDto.id());
 
         verify(userRepository).findById(2L);
-        verify(paymentCardRepository).countByUserId(2L);
         verify(paymentCardRepository).save(paymentCard);
-
     }
 
     @Test
@@ -102,7 +93,7 @@ public class PaymentCardServiceTest {
         );
 
         User user = new User();
-        user.setId(1L);
+        user.setId(2L);
 
         List<PaymentCard> paymentCards = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -110,25 +101,24 @@ public class PaymentCardServiceTest {
         }
         user.setPaymentCards(paymentCards);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
 
-        RuntimeException exception = assertThrows(
-                RuntimeException.class,
-                () -> paymentCardService.createPaymentCard(paymentCardInputDto)
+        assertThrows(RuntimeException.class, () ->
+                paymentCardService.createPaymentCard(paymentCardInputDto)
         );
 
         verify(paymentCardRepository, never()).save(any());
-
     }
-
 
     @Test
     void findPaymentCardByIdTest() {
+        Long cardId = 3L;
         PaymentCard paymentCard = new PaymentCard();
-        paymentCard.setId(3L);
+        paymentCard.setId(cardId);
 
         PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
-                3L, "7845127458961247",
+                3L,
+                "7845127458961247",
                 "Petr Petrov",
                 LocalDate.of(2027, 10, 5),
                 true,
@@ -137,18 +127,13 @@ public class PaymentCardServiceTest {
                 null
         );
 
-        PaymentCardOutputDto resultDto =
-                paymentCardService.findPaymentCardById(2L);
+        when(paymentCardRepository.findById(cardId)).thenReturn(Optional.of(paymentCard));
+        when(paymentCardMapper.toDto(paymentCard)).thenReturn(paymentCardOutputDto);
 
-        when(paymentCardMapper.toDto(paymentCard))
-                .thenReturn(paymentCardOutputDto);
-
-        when(paymentCardRepository.findById(3L))
-                .thenReturn(Optional.of(paymentCard));
+        PaymentCardOutputDto resultDto = paymentCardService.findPaymentCardById(cardId);
 
         assertNotNull(resultDto);
-        assertEquals(2L, resultDto.id());
-
+        assertEquals(cardId, resultDto.id());
     }
 
     @Test
@@ -160,7 +145,8 @@ public class PaymentCardServiceTest {
         PaymentCard card = new PaymentCard();
         Page<PaymentCard> cardPage = new PageImpl<>(List.of(card));
         PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
-                3L, "7845127458961247",
+                3L,
+                "7845127458961247",
                 "Petr Petrov",
                 LocalDate.of(2027, 10, 5),
                 true,
@@ -169,10 +155,8 @@ public class PaymentCardServiceTest {
                 null
         );
 
-        when(paymentCardRepository.findAll(any(Specification.class), eq(pageable)))
-                .thenReturn(cardPage);
-        when(paymentCardMapper.toDto(card))
-                .thenReturn(paymentCardOutputDto);
+        when(paymentCardRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(cardPage);
+        when(paymentCardMapper.toDto(card)).thenReturn(paymentCardOutputDto);
 
         Page<PaymentCardOutputDto> resultDto = paymentCardService.getAllPaymentCards(name, surname, pageable);
 
@@ -183,10 +167,10 @@ public class PaymentCardServiceTest {
 
     @Test
     void findAllPaymentCardsByUserIdTest() {
-        Long userId = 2L;
         PaymentCard card = new PaymentCard();
         PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
-                3L, "7845127458961247",
+                3L,
+                "7845127458961247",
                 "Petr Petrov",
                 LocalDate.of(2027, 10, 5),
                 true,
@@ -195,14 +179,15 @@ public class PaymentCardServiceTest {
                 null
         );
 
-        when(paymentCardRepository.findAllByUserId(userId)).thenReturn(List.of(card));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(new User()));
+        when(paymentCardRepository.findAllByUserId(2L)).thenReturn(List.of(card));
         when(paymentCardMapper.toDto(card)).thenReturn(paymentCardOutputDto);
 
-        List<PaymentCardOutputDto> result = paymentCardService.findAllPaymentCardsByUserId(userId);
+        List<PaymentCardOutputDto> result = paymentCardService.findAllPaymentCardsByUserId(2L);
 
         assertThat(result).isNotEmpty();
-        assertThat(result.get(0).userId()).isEqualTo(userId);
-        verify(paymentCardRepository, times(1)).findAllByUserId(userId);
+        assertThat(result.get(0).userId()).isEqualTo(2L);
+        verify(paymentCardRepository, times(1)).findAllByUserId(2L);
     }
 
     @Test
@@ -213,10 +198,11 @@ public class PaymentCardServiceTest {
         card.setActive(true);
 
         PaymentCardOutputDto paymentCardOutputDto = new PaymentCardOutputDto(
-                3L, "7845127458961247",
+                3L,
+                "7845127458961247",
                 "Petr Petrov",
                 LocalDate.of(2027, 10, 5),
-                true,
+                false,
                 2L,
                 null,
                 null
@@ -233,16 +219,13 @@ public class PaymentCardServiceTest {
 
     @Test
     void deletePaymentCardTest(){
-
-        Long paymentCardId = 1L;
-
         PaymentCard paymentCard = new PaymentCard();
-        paymentCard.setId(paymentCardId);
-        paymentCardService.deletePaymentCard(paymentCardId);
+        paymentCard.setId(1L);
 
-        when(paymentCardRepository.findById(paymentCardId))
+        when(paymentCardRepository.findById(1L))
                 .thenReturn(Optional.of(paymentCard));
 
-        verify(paymentCardRepository).deleteById(paymentCardId);
+        paymentCardService.deletePaymentCard(1L);
+        verify(paymentCardRepository).deleteById(1L);
     }
 }

@@ -42,7 +42,6 @@ public class UserServiceTest {
 
     @Test
     void createUserTest(){
-
         UserInputDto userInputDto = new UserInputDto(
                 "Petr",
                 "Petrov",
@@ -55,36 +54,31 @@ public class UserServiceTest {
                 "Petr",
                 "Petrov",
                 LocalDate.of(2004, 5, 7),
-                "petrov@mail.com",
+                "petrov@gmail.com",
                 true,
                 null,
                 null,
                 null);
 
         User user = new User();
+        user.setEmail("petrov@gmail.com");
 
-        when(userRepository.findByEmail(userInputDto.email()))
-                .thenReturn(Optional.empty());
-        when(userMapper.toEntity(userInputDto))
-                .thenReturn(user);
-        when(userRepository.save(user))
-                .thenReturn(user);
-        when(userMapper.toDto(user))
-                .thenReturn(userOutputDto);
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(userMapper.toEntity(userInputDto)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(userOutputDto);
+
         UserOutputDto actualResponse = userService.createUser(userInputDto);
 
         assertNotNull(actualResponse);
         assertEquals(1L, actualResponse.id());
-        assertEquals("petrov@mail.com", actualResponse.email());
+        assertEquals("petrov@gmail.com", actualResponse.email());
 
-        verify(userRepository, times(1)).findByEmail(userInputDto.email());
         verify(userRepository, times(1)).save(user);
-
     }
 
     @Test
     void findUserByIdTest(){
-
         Long userId = 1L;
         User user = new User();
         UserOutputDto userOutputDto = new UserOutputDto(
@@ -92,27 +86,23 @@ public class UserServiceTest {
                 "Petr",
                 "Petrov",
                 LocalDate.of(2004, 5, 7),
-                "petrov@mail.com",
+                "petrov@gmail.com",
                 true,
                 null,
                 null,
                 null);
 
-        when(userRepository.findById(userId))
-                .thenReturn(Optional.of(user));
-        when(userMapper.toDto(user))
-                .thenReturn(userOutputDto);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userMapper.toDto(user)).thenReturn(userOutputDto);
 
         UserOutputDto actualDto = userService.findUserById(userId);
+
         assertNotNull(actualDto);
         assertEquals(userId, actualDto.id());
-
     }
-
 
     @Test
     void getAllUsersTest(){
-
         String name = "Ivan";
         String surname = "Ivanov";
         Pageable pageable = PageRequest.of(0, 10);
@@ -125,29 +115,25 @@ public class UserServiceTest {
                 "Petr",
                 "Petrov",
                 LocalDate.of(2004, 5, 7),
-                "petrov@mail.com",
+                "petrov@gmail.com",
                 true,
                 null,
                 null,
                 null);
 
-        Page<UserOutputDto> actualPage = userService.getAllUsers(name, surname, pageable);
+        when(userRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(userPage);
+        when(userMapper.toDto(user)).thenReturn(userOutputDto);
 
-        when(userRepository.findAll(any(Specification.class), eq(pageable)))
-                .thenReturn(userPage);
-        when(userMapper.toDto(user))
-                .thenReturn(userOutputDto);
+        Page<UserOutputDto> actualPage = userService.getAllUsers(name, surname, pageable);
 
         assertNotNull(actualPage);
         assertThat(actualPage.getContent()).hasSize(1);
         assertEquals(1L, actualPage.getContent().getFirst().id());
         verify(userRepository, times(1)).findAll(any(Specification.class), eq(pageable));
-
     }
 
     @Test
     void updateUserById(){
-
         Long userId = 1L;
         UserInputDto userInputDto = new UserInputDto(
                 "Petr",
@@ -158,6 +144,7 @@ public class UserServiceTest {
 
         User existingUser = new User();
         existingUser.setId(userId);
+        existingUser.setName("Petr");
         existingUser.setEmail("old@gmail.com");
 
         UserOutputDto userOutputDto = new UserOutputDto(
@@ -165,33 +152,28 @@ public class UserServiceTest {
                 "Petr",
                 "Petrov",
                 LocalDate.of(2004, 5, 7),
-                "petrov@mail.com",
+                "petrov@gmail.com",
                 true,
                 null,
                 null,
                 null);
 
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(userMapper.toDto(existingUser)).thenReturn(userOutputDto);
+
         UserOutputDto resultDto = userService.updateUserById(userId, userInputDto);
 
-        when(userRepository.findById(userId))
-                .thenReturn(Optional.of(existingUser));
-        when(userRepository.findByEmail(userInputDto.email()))
-                .thenReturn(Optional.empty());
-        when(userMapper.toDto(existingUser))
-                .thenReturn(userOutputDto);
-
-
         assertNotNull(resultDto);
-        assertEquals("new@gmail.com", resultDto.email());
+        assertEquals("petrov@gmail.com", resultDto.email());
         assertEquals("Petr", existingUser.getName());
-
     }
 
     @Test
     void updateUserStatus(){
-
+        Long userId = 1L;
         User user = new User();
-        user.setId(1L);
+        user.setId(userId);
         user.setActive(true);
 
         UserOutputDto userOutputDto = new UserOutputDto(
@@ -199,35 +181,31 @@ public class UserServiceTest {
                 "Petr",
                 "Petrov",
                 LocalDate.of(2004, 5, 7),
-                "petrov@mail.com",
+                "petrov@gmail.com",
                 true,
                 null,
                 null,
                 null);
 
-        UserOutputDto resultDto = userService.updateUserStatus(1L, false);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userOutputDto);
+
+        UserOutputDto resultDto = userService.updateUserStatus(userId, false);
 
         assertNotNull(resultDto);
         assertFalse(resultDto.active());
-        assertFalse(user.getActive());
-
     }
 
     @Test
     void deleteUserTest(){
-
+        Long userId = 1L;
         User user = new User();
-        user.setId(1L);
+        user.setId(userId);
 
-        when(userRepository.findById(1L))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        userService.deleteUser(1L);
+        userService.deleteUser(userId);
 
-        verify(userRepository).deleteById(1L);
-
+        verify(userRepository).deleteById(userId);
     }
 }

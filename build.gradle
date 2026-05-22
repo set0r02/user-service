@@ -5,6 +5,10 @@ plugins {
     id 'io.freefair.lombok' version '9.2.0'
 }
 
+bootJar {
+    mainClass = 'com.innowise.microservice.UserServiceApplication'
+}
+
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 

@@ -10,6 +10,7 @@ import com.innowise.microservice.model.PaymentCard;
 import com.innowise.microservice.model.User;
 import com.innowise.microservice.repository.PaymentCardRepository;
 import com.innowise.microservice.repository.UserRepository;
+import com.innowise.microservice.service.PaymentCardService;
 import com.innowise.microservice.specifications.PaymentCardSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PaymentCardServiceImpl {
+public class PaymentCardServiceImpl implements PaymentCardService {
 
     private final PaymentCardRepository paymentCardRepository;
     private final UserRepository userRepository;

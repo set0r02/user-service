@@ -179,7 +179,6 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // Используем thenAnswer для динамического обновления DTO
         when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
             User u = invocation.getArgument(0);
             return new UserOutputDto(u.getId(),
@@ -202,7 +201,6 @@ public class UserServiceTest {
     @Test
     void deleteUserTest(){
         Long userId = 1L;
-        // Mock метода existsById, который вызывает сервис перед удалением
         when(userRepository.existsById(userId)).thenReturn(true);
 
         userService.deleteUser(userId);

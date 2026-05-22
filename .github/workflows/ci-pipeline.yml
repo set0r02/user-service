@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'feature/**'
+      - 'feature/USR-0'
   pull_request:
     branches:
       - main

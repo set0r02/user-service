@@ -177,19 +177,21 @@ public class UserServiceTest {
         user.setId(userId);
         user.setActive(true);
 
-        UserOutputDto userOutputDto = new UserOutputDto(
-                1L,
-                "Petr",
-                "Petrov",
-                LocalDate.of(2004, 5, 7),
-                "petrov@gmail.com",
-                true,
-                null,
-                null,
-                null);
-
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userOutputDto);
+
+        // Используем thenAnswer для динамического обновления DTO
+        when(userMapper.toDto(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            return new UserOutputDto(u.getId(),
+                    "Petr",
+                    "Petrov",
+                    LocalDate.of(2004, 5, 7),
+                    "petrov@gmail.com",
+                    u.getActive(),
+                    null,
+                    null,
+                    null);
+        });
 
         UserOutputDto resultDto = userService.updateUserStatus(userId, false);
 
@@ -200,10 +202,8 @@ public class UserServiceTest {
     @Test
     void deleteUserTest(){
         Long userId = 1L;
-        User user = new User();
-        user.setId(userId);
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        // Mock метода existsById, который вызывает сервис перед удалением
+        when(userRepository.existsById(userId)).thenReturn(true);
 
         userService.deleteUser(userId);
 

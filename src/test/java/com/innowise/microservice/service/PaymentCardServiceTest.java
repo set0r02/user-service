@@ -220,13 +220,10 @@ public class PaymentCardServiceTest {
 
     @Test
     void deletePaymentCardTest(){
-        PaymentCard paymentCard = new PaymentCard();
-        paymentCard.setId(1L);
-
-        when(paymentCardRepository.findById(1L))
-                .thenReturn(Optional.of(paymentCard));
+        when(paymentCardRepository.existsById(1L)).thenReturn(true);
 
         paymentCardService.deletePaymentCard(1L);
+
         verify(paymentCardRepository).deleteById(1L);
     }
 }

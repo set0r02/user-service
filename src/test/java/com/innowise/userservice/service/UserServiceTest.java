@@ -1,4 +1,4 @@
-package com.innowise.microservice.service;
+package com.innowise.userservice.service;
 
 import com.innowise.userservice.dto.UserInputDto;
 import com.innowise.userservice.dto.UserOutputDto;

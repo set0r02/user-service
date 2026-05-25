@@ -1,4 +1,4 @@
-package com.innowise.microservice.service;
+package com.innowise.userservice.service;
 
 import com.innowise.userservice.dto.PaymentCardInputDto;
 import com.innowise.userservice.dto.PaymentCardOutputDto;

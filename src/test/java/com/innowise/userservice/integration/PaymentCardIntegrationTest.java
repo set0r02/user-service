@@ -1,4 +1,4 @@
-package com.innowise.microservice.integration;
+package com.innowise.userservice.integration;
 
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +54,7 @@ class PaymentCardIntegrationTest {
     }
 
     private Object getTestUserId() throws Exception {
-        MvcResult userResult = mockMvc.perform(post("/api/user")
+        MvcResult userResult = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

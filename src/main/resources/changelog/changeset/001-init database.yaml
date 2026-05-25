@@ -8,7 +8,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: big serial
+                  type: bigint
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
               - column:
@@ -71,7 +72,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: big serial
+                  type: bigint
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
               - column:

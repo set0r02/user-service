@@ -1,4 +1,4 @@
-package com.innowise.microservice.integration;
+package com.innowise.userservice.integration;
 
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +53,7 @@ class UserIntegrationTest {
 
     @Test
     void createUserSuccessfullyTest() throws Exception {
-        mockMvc.perform(post("/api/user")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -72,7 +72,7 @@ class UserIntegrationTest {
 
     @Test
     void updateUserTest() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/user")
+        MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -89,7 +89,7 @@ class UserIntegrationTest {
         String response = result.getResponse().getContentAsString();
         Object id = JsonPath.read(response, "$.id");
 
-        mockMvc.perform(put("/api/user/" + id)
+        mockMvc.perform(put("/api/users/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -107,7 +107,7 @@ class UserIntegrationTest {
 
     @Test
     void updateUserStatusTest() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/user")
+        MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -124,16 +124,16 @@ class UserIntegrationTest {
         String response = result.getResponse().getContentAsString();
         Object id = JsonPath.read(response, "$.id");
 
-        mockMvc.perform(patch("/api/user/" + id + "/status/false"))
+        mockMvc.perform(patch("/api/users/" + id + "/status/false"))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(patch("/api/user/" + id + "/status/true"))
+        mockMvc.perform(patch("/api/users/" + id + "/status/true"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void deleteUserTest() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/user")
+        MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -150,7 +150,7 @@ class UserIntegrationTest {
         String response = result.getResponse().getContentAsString();
         Object id = JsonPath.read(response, "$.id");
 
-        mockMvc.perform(delete("/api/user/" + id))
+        mockMvc.perform(delete("/api/users/" + id))
                 .andExpect(status().isNoContent());
     }
 }

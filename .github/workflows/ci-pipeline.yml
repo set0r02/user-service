@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           java-version: '25'
@@ -38,7 +38,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew sonar -Dsonar.projectKey=my-spring-boot-app
+        run: ./gradlew sonar
 
       - name: Build Boot JAR Artifact
         run: ./gradlew bootJar -x test

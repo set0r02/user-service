@@ -2,7 +2,7 @@ package com.innowise.userservice.controller;
 
 import com.innowise.userservice.dto.PaymentCardInputDto;
 import com.innowise.userservice.dto.PaymentCardOutputDto;
-import com.innowise.userservice.service.impl.PaymentCardServiceImpl;
+import com.innowise.userservice.service.PaymentCardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentCardController {
 
-    private final PaymentCardServiceImpl paymentCardService;
+    private final PaymentCardService paymentCardService;
 
     @PostMapping
     public ResponseEntity<PaymentCardOutputDto> createPaymentCard(@RequestBody @Valid PaymentCardInputDto paymentCardInputDto){

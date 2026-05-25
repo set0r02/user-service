@@ -32,8 +32,8 @@ public class UserController {
 
     @GetMapping()
     public ResponseEntity<Page<UserOutputDto>> getAllUsers(
-            @RequestParam String firstName,
-            @RequestParam String surname,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String surname,
             Pageable pageable
     ){
         Page<UserOutputDto> userOutputDtoPage = userService.getAllUsers(firstName,surname,pageable);

@@ -2,6 +2,7 @@ package com.innowise.userservice.service;
 
 import com.innowise.userservice.dto.PaymentCardInputDto;
 import com.innowise.userservice.dto.PaymentCardOutputDto;
+import com.innowise.userservice.exceptions.MaxPaymentCardsUserException;
 import com.innowise.userservice.mapper.PaymentCardMapper;
 import com.innowise.userservice.model.PaymentCard;
 import com.innowise.userservice.model.User;
@@ -84,8 +85,9 @@ public class PaymentCardServiceTest {
     }
 
     @Test
-    void ThrowExceptionWhenCardLimitMoreThanFiveReachedTest(){
-        PaymentCardInputDto paymentCardInputDto = new PaymentCardInputDto(
+    void ThrowExceptionWhenCardLimitMoreThanFiveReachedTest() {
+
+        PaymentCardInputDto dto = new PaymentCardInputDto(
                 "7845127458961247",
                 "Petr Petrov",
                 LocalDate.of(2027, 10, 5),
@@ -96,16 +98,12 @@ public class PaymentCardServiceTest {
         User user = new User();
         user.setId(2L);
 
-        List<PaymentCard> paymentCards = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            paymentCards.add(new PaymentCard());
-        }
-        user.setPaymentCards(paymentCards);
-
         when(userRepository.findById(2L)).thenReturn(Optional.of(user));
 
-        assertThrows(RuntimeException.class, () ->
-                paymentCardService.createPaymentCard(paymentCardInputDto)
+        when(paymentCardRepository.countByUserId(2L)).thenReturn(5);
+
+        assertThrows(MaxPaymentCardsUserException.class, () ->
+                paymentCardService.createPaymentCard(dto)
         );
 
         verify(paymentCardRepository, never()).save(any());

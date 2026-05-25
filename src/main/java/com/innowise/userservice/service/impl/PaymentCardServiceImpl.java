@@ -85,8 +85,14 @@ public class PaymentCardServiceImpl implements PaymentCardService {
         paymentCard.setNumber(paymentCardInputDto.number());
         paymentCard.setHolder(paymentCardInputDto.holder());
         paymentCard.setExpirationDate(paymentCardInputDto.expirationDate());
-
-        return paymentCardMapper.toDto(paymentCard);
+        paymentCard.setActive(paymentCardInputDto.active());
+        if(paymentCardInputDto.userId()!= null && !paymentCardInputDto.userId().equals(paymentCard.getUser().getId())){
+            User user = userRepository.findById(paymentCardInputDto.userId()).orElseThrow(
+                    () -> new EntityNotFoundException("User", paymentCardInputDto.userId())
+            );
+            paymentCard.setUser(user);
+        }
+        return paymentCardMapper.toDto(paymentCardRepository.save(paymentCard));
     }
 
 

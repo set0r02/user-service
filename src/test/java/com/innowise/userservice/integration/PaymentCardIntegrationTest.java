@@ -150,7 +150,9 @@ class PaymentCardIntegrationTest {
         String response = result.getResponse().getContentAsString();
         Object cardId = JsonPath.read(response, "$.id");
 
-        mockMvc.perform(patch(BASE_URL + "/" + cardId + "/status/false"))
+        mockMvc.perform(patch(BASE_URL + "/" + cardId + "/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("false"))
                 .andExpect(status().isNoContent());
     }
 

@@ -54,8 +54,8 @@ public class PaymentCardController {
         return ResponseEntity.ok(paymentCardOutputDtoUpdatedById);
     }
 
-    @PatchMapping("/{id}/status/{active}")
-    public ResponseEntity<Void> updateCardPaymentStatus(@PathVariable Long id,@PathVariable Boolean active){
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> updateCardPaymentStatus(@PathVariable Long id,@RequestBody Boolean active){
         paymentCardService.updateCardPaymentStatus(id,active);
         return ResponseEntity.noContent().build();
     }

@@ -8,8 +8,8 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-public class BookstoreApplication {
+public class UserServiceApplication {
     static void main(String[] args) {
-        var context = SpringApplication.run(BookstoreApplication.class, args);
+        var context = SpringApplication.run(UserServiceApplication.class, args);
     }
 }

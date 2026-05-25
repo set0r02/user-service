@@ -12,7 +12,7 @@ public interface UserMapper {
 
     User toEntity(UserInputDto dto);
 
-    @Mapping(target = "paymentCards", source = "paymentCards")
+    @Mapping(target = "cards", source = "paymentCards")
     UserOutputDto toDto(User entity);
 
 }

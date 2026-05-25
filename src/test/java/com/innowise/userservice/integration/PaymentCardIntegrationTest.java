@@ -38,7 +38,7 @@ class PaymentCardIntegrationTest {
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
-    private final String BASE_URL = "/api/payment-card";
+    private final String BASE_URL = "/api/payment-cards";
 
     @BeforeEach
     void setUp() {

@@ -1,13 +1,13 @@
 package com.innowise.microservice.service;
 
-import com.innowise.microservice.dto.PaymentCardInputDto;
-import com.innowise.microservice.dto.PaymentCardOutputDto;
-import com.innowise.microservice.mapper.PaymentCardMapper;
-import com.innowise.microservice.model.PaymentCard;
-import com.innowise.microservice.model.User;
-import com.innowise.microservice.repository.PaymentCardRepository;
-import com.innowise.microservice.repository.UserRepository;
-import com.innowise.microservice.service.impl.PaymentCardServiceImpl;
+import com.innowise.userservice.dto.PaymentCardInputDto;
+import com.innowise.userservice.dto.PaymentCardOutputDto;
+import com.innowise.userservice.mapper.PaymentCardMapper;
+import com.innowise.userservice.model.PaymentCard;
+import com.innowise.userservice.model.User;
+import com.innowise.userservice.repository.PaymentCardRepository;
+import com.innowise.userservice.repository.UserRepository;
+import com.innowise.userservice.service.impl.PaymentCardServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

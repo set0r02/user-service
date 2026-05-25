@@ -1,11 +1,11 @@
 package com.innowise.microservice.service;
 
-import com.innowise.microservice.dto.UserInputDto;
-import com.innowise.microservice.dto.UserOutputDto;
-import com.innowise.microservice.mapper.UserMapper;
-import com.innowise.microservice.model.User;
-import com.innowise.microservice.repository.UserRepository;
-import com.innowise.microservice.service.impl.UserServiceImpl;
+import com.innowise.userservice.dto.UserInputDto;
+import com.innowise.userservice.dto.UserOutputDto;
+import com.innowise.userservice.mapper.UserMapper;
+import com.innowise.userservice.model.User;
+import com.innowise.userservice.repository.UserRepository;
+import com.innowise.userservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

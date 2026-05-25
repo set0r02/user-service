@@ -9,16 +9,16 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   liquibase:
-    change-log-path: classpath:db/changelog/db.changelog-master.yaml
+    change-log-path: classpath:changelog/db.changelog-master.yaml
     enabled: true
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show_sql: true
+      ddl-auto: validate
+    show_sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
   data:
     redis:

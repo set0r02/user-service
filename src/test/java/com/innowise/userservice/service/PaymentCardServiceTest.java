@@ -98,15 +98,22 @@ public class PaymentCardServiceTest {
         User user = new User();
         user.setId(2L);
 
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L))
+                .thenReturn(Optional.of(user));
 
-        when(paymentCardRepository.countByUserId(2L)).thenReturn(5);
+        when(paymentCardRepository.countByUserId(2L))
+                .thenReturn(5);
 
         assertThrows(MaxPaymentCardsUserException.class, () ->
                 paymentCardService.createPaymentCard(dto)
         );
 
+        verify(paymentCardRepository, times(1))
+                .countByUserId(2L);
+
         verify(paymentCardRepository, never()).save(any());
+
+        verifyNoInteractions(paymentCardMapper);
     }
 
     @Test
@@ -191,6 +198,72 @@ public class PaymentCardServiceTest {
 
     @Test
     void updatePaymentCardByIdTest() {
+
+        Long cardId = 10L;
+
+        User oldUser = new User();
+        oldUser.setId(1L);
+
+        User newUser = new User();
+        newUser.setId(2L);
+
+        PaymentCard existingCard = new PaymentCard();
+        existingCard.setId(cardId);
+        existingCard.setNumber("old-number");
+        existingCard.setHolder("Old Holder");
+        existingCard.setExpirationDate(LocalDate.of(2026, 1, 1));
+        existingCard.setActive(true);
+
+        existingCard.setUser(oldUser);
+
+        PaymentCardInputDto dto = new PaymentCardInputDto(
+                "new-number",
+                "New Holder",
+                LocalDate.of(2030, 12, 31),
+                false,
+                2L
+        );
+
+        PaymentCardOutputDto outputDto = new PaymentCardOutputDto(
+                cardId,
+                "new-number",
+                "New Holder",
+                LocalDate.of(2030, 12, 31),
+                false,
+                2L,
+                null,
+                null
+        );
+
+        when(paymentCardRepository.findById(cardId))
+                .thenReturn(Optional.of(existingCard));
+
+        when(paymentCardRepository.findByNumber(any()))
+                .thenReturn(Optional.empty());
+
+        when(userRepository.findById(2L))
+                .thenReturn(Optional.of(newUser));
+
+        when(paymentCardRepository.save(existingCard))
+                .thenReturn(existingCard);
+
+        when(paymentCardMapper.toDto(existingCard))
+                .thenReturn(outputDto);
+
+        PaymentCardOutputDto result =
+                paymentCardService.updatePaymentCardById(cardId, dto);
+
+        assertNotNull(result);
+        assertEquals("new-number", result.number());
+        assertEquals("New Holder", result.holder());
+        assertFalse(existingCard.getActive());
+        assertEquals(2L, existingCard.getUser().getId());
+    }
+
+
+
+    @Test
+    void updatePaymentStatusTest() {
         Long cardId = 10L;
         PaymentCard card = new PaymentCard();
         card.setId(cardId);

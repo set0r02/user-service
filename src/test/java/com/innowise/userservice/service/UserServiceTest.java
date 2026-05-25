@@ -159,9 +159,12 @@ public class UserServiceTest {
                 null,
                 null);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
-        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(userMapper.toDto(existingUser)).thenReturn(userOutputDto);
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmail(any()))
+                .thenReturn(Optional.empty());
+        when(userMapper.toDto(existingUser))
+                .thenReturn(userOutputDto);
 
         UserOutputDto resultDto = userService.updateUserById(userId, userInputDto);
 

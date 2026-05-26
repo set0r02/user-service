@@ -124,10 +124,14 @@ class UserIntegrationTest {
         String response = result.getResponse().getContentAsString();
         Object id = JsonPath.read(response, "$.id");
 
-        mockMvc.perform(patch("/api/users/" + id + "/status/false"))
+        mockMvc.perform(patch("/api/users/" + id + "/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("false"))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(patch("/api/users/" + id + "/status/true"))
+        mockMvc.perform(patch("/api/users/" + id + "/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("true"))
                 .andExpect(status().isNoContent());
     }
 

@@ -46,8 +46,8 @@ public class UserController {
         return ResponseEntity.ok(userOutputDtoUpdatedById);
     }
 
-    @PatchMapping("/{id}/status/{active}")
-    public ResponseEntity<Void> updateUserStatus(@PathVariable Long id, @PathVariable boolean active){
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> updateUserStatus(@PathVariable Long id, @RequestBody Boolean active){
         userService.updateUserStatus(id,active);
         return ResponseEntity.noContent().build();
     }

@@ -11,9 +11,9 @@ import java.util.Date;
 
 @Component
 public class JwtManager {
+
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
-
 
     public JwtManager(JwtProperties jwtProperties){
         this.jwtProperties = jwtProperties;

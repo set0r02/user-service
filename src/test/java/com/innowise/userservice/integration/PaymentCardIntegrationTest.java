@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -73,6 +74,7 @@ class PaymentCardIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void createPaymentCardSuccessfullyTest() throws Exception {
         Object userId = getTestUserId();
 
@@ -94,6 +96,7 @@ class PaymentCardIntegrationTest {
 
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updatePaymentCardTest() throws Exception {
         Object userId = getTestUserId();
 
@@ -130,6 +133,7 @@ class PaymentCardIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updateCardPaymentStatusTest() throws Exception {
         Object userId = getTestUserId();
 
@@ -157,6 +161,7 @@ class PaymentCardIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void deletePaymentCardTest() throws Exception {
         Object userId = getTestUserId();
 

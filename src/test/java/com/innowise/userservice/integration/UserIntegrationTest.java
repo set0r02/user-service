@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -52,6 +53,7 @@ class UserIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void createUserSuccessfullyTest() throws Exception {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,6 +73,7 @@ class UserIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updateUserTest() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -106,6 +109,7 @@ class UserIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updateUserStatusTest() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -136,6 +140,7 @@ class UserIntegrationTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void deleteUserTest() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)

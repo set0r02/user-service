@@ -29,8 +29,8 @@ spring:
     level: INFO
 
 
-  jwt:
-    secret: 8f4c7a1d9b2e5f6a8c3d7e1f9a2b4c6d
-    access-token-expiration: 900000
-    refresh-token-expiration: 604800000
+jwt:
+  secret: 8f4c7a1d9b2e5f6a8c3d7e1f9a2b4c6d
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
 
